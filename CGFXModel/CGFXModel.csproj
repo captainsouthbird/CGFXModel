@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3FFCB8F0-D2B9-4BF2-9953-D735464170A2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CGFXModel</RootNamespace>
+    <AssemblyName>CGFXModel</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CGFX.cs" />
+    <Compile Include="CGFXDebug.cs" />
+    <Compile Include="Chunks\Chunk.cs" />
+    <Compile Include="Chunks\ChunkDATA.cs" />
+    <Compile Include="Chunks\ChunkDICT.cs" />
+    <Compile Include="Chunks\DICTObjTransformable.cs" />
+    <Compile Include="Chunks\MetaData\MetaData.cs" />
+    <Compile Include="Chunks\Model\AnimGroup\ChunkDICTAnimGroup.cs" />
+    <Compile Include="Chunks\Model\AnimGroup\ChunkDICTAnimGroupElement.cs" />
+    <Compile Include="Chunks\Model\ChunkDICTModel.cs" />
+    <Compile Include="Chunks\Model\DICTObjSkeleton.cs" />
+    <Compile Include="Chunks\Model\DICTObjMesh.cs" />
+    <Compile Include="Chunks\Model\DICTObjShape.cs" />
+    <Compile Include="Chunks\Model\GLDataType.cs" />
+    <Compile Include="Chunks\Model\Material\FragmentShader.cs" />
+    <Compile Include="Chunks\Model\Material\ChunkDICTLUT.cs" />
+    <Compile Include="Chunks\Model\Material\LUTReference.cs" />
+    <Compile Include="Chunks\Model\Material\TextureReference.cs" />
+    <Compile Include="Chunks\Model\Material\FragmentOperationContainer.cs" />
+    <Compile Include="Chunks\Model\Material\MaterialColorContainer.cs" />
+    <Compile Include="Chunks\Model\Material\RasterizationContainer.cs" />
+    <Compile Include="Chunks\Model\Material\ShaderReference.cs" />
+    <Compile Include="Chunks\Model\Material\TextureCoord.cs" />
+    <Compile Include="Chunks\Model\Material\TextureMapper.cs" />
+    <Compile Include="Chunks\Model\Material\TextureSampler.cs" />
+    <Compile Include="Chunks\Model\Material\TranslucencyKind.cs" />
+    <Compile Include="Chunks\Model\Shape\BlendShape.cs" />
+    <Compile Include="Chunks\Model\DICTObjMeshNodeVisibility.cs" />
+    <Compile Include="Chunks\Model\Shape\Face.cs" />
+    <Compile Include="Chunks\Model\Shape\FaceDescriptor.cs" />
+    <Compile Include="Chunks\Model\Shape\VertexAttribute.cs" />
+    <Compile Include="Chunks\Model\Shape\VertexBuffer.cs" />
+    <Compile Include="Chunks\Model\Shape\VertexBufferFixed.cs" />
+    <Compile Include="Chunks\Model\Shape\VertexBufferInterleaved.cs" />
+    <Compile Include="Chunks\Model\Skeleton\ChunkDICTBone.cs" />
+    <Compile Include="Utilities\PatriciaTree.cs" />
+    <Compile Include="Chunks\Texture\ChunkDICTTexture.cs" />
+    <Compile Include="Chunks\ChunkIMAG.cs" />
+    <Compile Include="Chunks\Model\Material\ChunkDICTMaterial.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\Color.cs" />
+    <Compile Include="Utilities\RelativeDataQueue.cs" />
+    <Compile Include="Utilities\SaveContext.cs" />
+    <Compile Include="Utilities\TextureCodec.cs" />
+    <Compile Include="Utilities\Utility.cs" />
+    <Compile Include="Utilities\Math.cs" />
+    <Compile Include="Utilities\VertexBufferCodec.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
