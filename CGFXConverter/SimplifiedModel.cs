@@ -134,7 +134,7 @@ namespace CGFXConverter
                 var model = (DICTObjModel)models.First().EntryObject;
 
                 // NOTE: Currently NOT committing the skeleton back, we're just keeping it for model software
-                var bones = model.Skeleton.Bones.Entries.Select(e => e.EntryObject).Cast<DICTObjBone>().ToList();
+                var bones = model.Skeleton?.Bones.Entries.Select(e => e.EntryObject).Cast<DICTObjBone>().ToList() ?? new List<DICTObjBone>();
 
                 Bones = bones.Select(b => new SMBone
                 {
@@ -232,7 +232,7 @@ namespace CGFXConverter
                     // vertices are recorded as having no bone indices but in fact are all dependent
                     // upon associating with bone index 0 (?) This will force it to use at least
                     // one bone index even if zero is specified for this case.
-                    if (boneReferences.Count > 0)
+                    if (boneReferences != null && boneReferences.Count > 0)
                     {
                         boneIndexCount = Math.Max(boneIndexCount, 1);
                     }

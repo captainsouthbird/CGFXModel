@@ -69,7 +69,7 @@ namespace CGFXModel.Chunks.Model
                 CGFXDebug.LoadStart(sm, utility);
 
                 // Bone Indices
-                sm.BoneIndices = utility.LoadIndirectValueList(() => utility.ReadU32()).ToList();
+                sm.BoneIndices = utility.LoadIndirectValueList(() => utility.ReadU32())?.ToList();
 
                 // Skinning
                 sm.Skinning = (SubMeshSkinning)utility.ReadU32();
