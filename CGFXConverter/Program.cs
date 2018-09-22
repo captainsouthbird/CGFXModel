@@ -191,36 +191,37 @@ Supported input file types are: ms3d (MilkShape)
                             throw new NotImplementedException($"Unsupported Source filetype {inFileExt}");
                         }
 
+                        // Import textures
+                        var dumpTextureDir = Path.GetDirectoryName(inFile);
+
+                        // Find WHAT textures we have (user has option to not include any or all)
+                        var importTextures = simplifiedModel.Textures
+                            .Select(t => new
+                            {
+                                Filename = Path.Combine(dumpTextureDir, t.Name + ".png"),
+                                Texture = t
+                            })
+                            .Where(t => File.Exists(t.Filename))
+                            .Select(t => new
+                            {
+                                t.Texture.Name,
+                                TextureBitmap = Image.FromFile(t.Filename)
+                            })
+                            .ToList();
+
+                        foreach (var texture in importTextures)
+                        {
+                            Console.WriteLine($"Importing texture {texture.Name}...");
+
+                            // Corresponding texture in SimplifiedModel
+                            var smTexture = simplifiedModel.Textures.Where(t => t.Name == texture.Name).Single();
+                            smTexture.TextureBitmap = (Bitmap)texture.TextureBitmap;
+                        }
+
                         simplifiedModel.ApplyChanges();
                         cgfxBase.Save(bw);
                     }
 
-                    // Import textures
-                    var dumpTextureDir = Path.GetDirectoryName(inFile);
-
-                    // Find WHAT textures we have (user has option to not include any or all)
-                    var importTextures = simplifiedModel.Textures
-                        .Select(t => new
-                        {
-                            Filename = Path.Combine(dumpTextureDir, t.Name + ".png"),
-                            Texture = t
-                        })
-                        .Where(t => File.Exists(t.Filename))
-                        .Select(t => new
-                        {
-                            t.Texture.Name,
-                            TextureBitmap = Image.FromFile(t.Filename)
-                        })
-                        .ToList();
-
-                    foreach (var texture in importTextures)
-                    {
-                        Console.WriteLine($"Importing texture {texture.Name}...");
-
-                        // Corresponding texture in SimplifiedModel
-                        var smTexture = simplifiedModel.Textures.Where(t => t.Name == texture.Name).Single();
-                        smTexture.TextureBitmap = (Bitmap)texture.TextureBitmap;
-                    }
 
                     Console.WriteLine();
                     Console.WriteLine("Done.");
