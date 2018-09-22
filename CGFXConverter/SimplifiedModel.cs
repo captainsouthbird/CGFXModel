@@ -428,6 +428,67 @@ namespace CGFXConverter
             }
         }
 
+        public void RecomputeVertexNormals()
+        {
+            foreach(var mesh in Meshes)
+            {
+                var triangleFaceNormals = mesh.Triangles
+                    .Select(t => new
+                    {
+                        Triangle = t,
+                        Normal = CalcFaceNormal(mesh, t)
+                    })
+                    .ToList();
+
+                for(var v = 0; v < mesh.Vertices.Count; v++)
+                {
+                    var allFaceNormals = triangleFaceNormals.Where(t => t.Triangle.v1 == v || t.Triangle.v2 == v || t.Triangle.v3 == v)
+                        .Select(t => t.Normal);
+
+                    var vertexNormal = new Vector3(
+                        allFaceNormals.Sum(n => n.X),
+                        allFaceNormals.Sum(n => n.Y),
+                        allFaceNormals.Sum(n => n.Z)
+                    );
+
+                    var len = Math.Sqrt(vertexNormal.X * vertexNormal.X + vertexNormal.Y * vertexNormal.Y + vertexNormal.Z * vertexNormal.Z);
+                    vertexNormal.X /= (float)len;
+                    vertexNormal.Y /= (float)len;
+                    vertexNormal.Z /= (float)len;
+
+                    mesh.Vertices[v].Normal = vertexNormal;
+                }
+            }
+        }
+
+        private Vector3 CalcFaceNormal(SMMesh mesh, SMTriangle triangle)
+        {
+            var v1 = mesh.Vertices[triangle.v1];
+            var v2 = mesh.Vertices[triangle.v2];
+            var v3 = mesh.Vertices[triangle.v3];
+
+            var UX = v2.Position.X - v1.Position.X;
+            var UY = v2.Position.Y - v1.Position.Y;
+            var UZ = v2.Position.Z - v1.Position.Z;
+
+            var VX = v3.Position.X - v1.Position.X;
+            var VY = v3.Position.Y - v1.Position.Y;
+            var VZ = v3.Position.Z - v1.Position.Z;
+
+            var NX = UY * VZ - UZ * VY;
+            var NY = UZ * VX - UX * VZ;
+            var NZ = UX * VY - UY * VX;
+
+            var len = Math.Sqrt(NX * NX + NY * NY + NZ * NZ);
+
+            return new Vector3
+            {
+                X = (float)(NX / len),
+                Y = (float)(NY / len),
+                Z = (float)(NZ / len)
+            };
+        }
+
         private static VertexBufferCodec.BoneIndices GetBoneIndices(int[] indices)
         {
             var result = new VertexBufferCodec.BoneIndices();

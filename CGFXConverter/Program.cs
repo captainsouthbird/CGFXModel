@@ -218,6 +218,7 @@ Supported input file types are: ms3d (MilkShape)
                             smTexture.TextureBitmap = (Bitmap)texture.TextureBitmap;
                         }
 
+                        simplifiedModel.RecomputeVertexNormals();
                         simplifiedModel.ApplyChanges();
                         cgfxBase.Save(bw);
                     }
