@@ -143,25 +143,38 @@ namespace CGFXConverter
             {
                 var mesh = simplifiedModel.Meshes[m];
 
+                // Since it's still useful to HAVE groups (for showing/hiding mainly), I'm allowing 
+                // MilkShape groups to be named in ways that will group them together as such:
+                //  mesh0       -- Basic name of mesh index 0
+                //  mesh0-top   -- Also should be part of mesh index 0, but is the "top" geometry of something etc.
+                //
+                // ... so in this example, both "mesh0" and "mesh0-top" will be merged together into
+                // Mesh Index 0, so you can still use groups in a useful way and reference back the
+                // eventual CGFX mesh it's actually supposed to be a part of...
                 var meshName = $"mesh{m}";
-                var milkShapeGroupMatches = milkShape.Groups.Where(g => g.Name == meshName);
-                if(milkShapeGroupMatches.Count() == 0)
+                var milkShapeGroupMatches = milkShape.Groups.Where(g => g.Name.StartsWith(meshName));
+                if(!milkShapeGroupMatches.Any())
                 {
                     throw new KeyNotFoundException($"Required MilkShape group {meshName} not found");
-                }
-                else if(milkShapeGroupMatches.Count() > 1)
-                {
-                    throw new KeyNotFoundException($"Multiple MilkShape groups named {meshName} found, ambiguous match");
                 }
 
                 // CGFX stores vertices per mesh, but the vertices were all lumped together for MilkShape.
                 // To reverse the process, we need to find out what vertices were used by all triangles in
                 // this milkShapeGroup and that becomes our list of vertices for this mesh. Of course, we 
                 // still need to have a MilkShape vertex -> CGFX mesh vertex map to translate the triangles.
-                var milkShapeGroup = milkShapeGroupMatches.Single();
+
+                // TODO -- Groups in MilkShape define a MaterialIndex, which isn't currently used, but if
+                // it were, having different materials across the merged groups wouldn't work. This will
+                // call the user out if they do that and eventually someday it might really matter.
+                if(milkShapeGroupMatches.Select(g => g.MaterialIndex).Distinct().Count() > 1)
+                {
+                    throw new InvalidOperationException($"Groups {string.Join(", ", milkShapeGroupMatches.Select(g => g.Name))} are to be merged into {meshName} but they have different materials assigned to them! This is not supported.");
+                }
+
+                var milkShapeGroupsTriangleIndices = milkShapeGroupMatches.SelectMany(g => g.TriangleIndices);
 
                 // Triangles in this group
-                var triangles = milkShapeGroup.TriangleIndices
+                var triangles = milkShapeGroupsTriangleIndices
                     .Select(ti => milkShape.Triangles[ti])
                     .ToList();
 
