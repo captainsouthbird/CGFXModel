@@ -331,6 +331,29 @@ namespace CGFXConverter
                             Marshal.Copy(imgData.Scan0, rawRGBAData, 0, rawRGBAData.Length);
                             textureBitmap.UnlockBits(imgData);
 
+                            if(textureBitmap.PixelFormat == PixelFormat.Format24bppRgb)
+                            {
+                                // Need to upconvert the data to RGBA before going in!
+                                var newData = new byte[textureBitmap.Width * textureBitmap.Height * 4];
+
+                                var newDataOffset = 0;
+                                for(var oldDataOffset = 0; oldDataOffset < rawRGBAData.Length; oldDataOffset += 3)
+                                {
+                                    newData[newDataOffset + 0] = rawRGBAData[oldDataOffset + 0];
+                                    newData[newDataOffset + 1] = rawRGBAData[oldDataOffset + 1];
+                                    newData[newDataOffset + 2] = rawRGBAData[oldDataOffset + 2];
+                                    newData[newDataOffset + 3] = 0xFF;
+
+                                    newDataOffset += 4;
+                                }
+
+                                rawRGBAData = newData;
+                            }
+                            else if(textureBitmap.PixelFormat != PixelFormat.Format32bppArgb)
+                            {
+                                throw new InvalidOperationException($"{textureData.Name} import: Unsupported image format {textureBitmap.PixelFormat}");
+                            }
+
                             var utility = new Utility(null, null, Endianness.Little);
                             textureData.SetTexture(utility, rawRGBAData);       // TODO -- try disabling the safety checks...
                         }

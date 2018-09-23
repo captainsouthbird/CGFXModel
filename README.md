@@ -31,6 +31,8 @@ I didn't want to just change existing data, but be free to edit the geometry, wi
 
 ## **Limitations**
 
+First and foremost, remember that a 3DS is not a PC. It has some pretty restrictive internal limits because of the nature of its hardware. Do not expect to import photorealistic model meshes and everything will be OK. I've already hit some limits by having just *slightly* too complex geometry that crashed the game on start. (Though unfortunately I couldn't link it to any specific amount of what type of geometrical data was "too much.") The file was "valid" as far as viewers were concerned, but the game wasn't taking it!
+
 **Conversion Format:** Right now this tool only converts to/from MilkShape 3D's format. I know this is a bit of bizarre choice especially since it's outdated software, but I did so because MilkShape is also very constrained and gives a reasonable expectation of what you can actually use my tool for. In the future, something more modern/common like DAE would be good, so long as it can observe limits. MilkShape can import/export some formats so it could possibly be an in-between tool.
 
 **Skeleton:** Editing the skeleton of the model is not supported and you can't do that in MilkShape (beyond assigning vertices), but since ACNL villagers share animations, you wouldn't want to do that anyway. It either wouldn't work right or might even crash the game! You CAN assign vertices to the skeleton for use with new geometry, however!
