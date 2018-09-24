@@ -451,33 +451,120 @@ namespace CGFXConverter
             }
         }
 
+        private class CloseVertex
+        {
+            public CloseVertex()
+            {
+                Position = new Vector3();
+                NormalSum = new Vector3();
+            }
+
+            public Vector3 Position { get; set; }
+            public Vector3 NormalSum { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is CloseVertex)
+                {
+                    var v2 = ((CloseVertex)obj).Position;
+                    return CloseCheck(v2);
+                }
+                else if(obj is Vector3)
+                {
+                    return CloseCheck((Vector3)obj);
+                }
+                else
+                {
+                    return base.Equals(obj);
+                }
+            }
+
+            private bool CloseCheck(Vector3 v2)
+            {
+                const float fuzzy = 0.01f;
+
+                var diffX = Math.Abs(Position.X - v2.X);
+                var diffY = Math.Abs(Position.Y - v2.Y);
+                var diffZ = Math.Abs(Position.Z - v2.Z);
+
+                return (diffX < fuzzy) && (diffY < fuzzy) && (diffZ < fuzzy);
+            }
+
+            public static bool operator ==(CloseVertex v1, CloseVertex v2)
+            {
+                return v1.Equals(v2);
+            }
+
+            public static bool operator !=(CloseVertex v1, CloseVertex v2)
+            {
+                return !v1.Equals(v2);
+            }
+
+            public static bool operator ==(CloseVertex v1, Vector3 v2)
+            {
+                return v1.Equals(v2);
+            }
+
+            public static bool operator !=(CloseVertex v1, Vector3 v2)
+            {
+                return !v1.Equals(v2);
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
+        }
+
         public void RecomputeVertexNormals()
         {
+            var verts = Meshes.SelectMany(m => m.Vertices).Select(v => v.Position).ToList();
+
+            var closeVertices = new List<CloseVertex>();
+            foreach (var vert in verts)
+            {
+                if(!closeVertices.Where(cv => cv == vert).Any())
+                {
+                    closeVertices.Add(new CloseVertex() { Position = vert });
+                }
+            }
+
+            // Get all mesh all triangles
+            // Compute their normals
+            // They reference close verts to average out the normals
+            // Then individual verts reference close verts
+            foreach (var mesh in Meshes)
+            {
+                foreach (var triangle in mesh.Triangles)
+                {
+                    var v1 = mesh.Vertices[triangle.v1].Position;
+                    var v2 = mesh.Vertices[triangle.v2].Position;
+                    var v3 = mesh.Vertices[triangle.v3].Position;
+
+                    var normal = CalcFaceNormal(mesh, triangle);
+
+                    var cv1 = closeVertices.Where(cv => cv == v1).Single();
+                    var cv2 = closeVertices.Where(cv => cv == v2).Single();
+                    var cv3 = closeVertices.Where(cv => cv == v3).Single();
+
+                    cv1.NormalSum += normal;
+                    cv2.NormalSum += normal;
+                    cv3.NormalSum += normal;
+                }
+            }
+
+
             foreach(var mesh in Meshes)
             {
-                var triangleFaceNormals = mesh.Triangles
-                    .Select(t => new
-                    {
-                        Triangle = t,
-                        Normal = CalcFaceNormal(mesh, t)
-                    })
-                    .ToList();
-
                 for(var v = 0; v < mesh.Vertices.Count; v++)
                 {
-                    var allFaceNormals = triangleFaceNormals.Where(t => t.Triangle.v1 == v || t.Triangle.v2 == v || t.Triangle.v3 == v)
-                        .Select(t => t.Normal);
+                    var vertex = mesh.Vertices[v];
 
-                    var vertexNormal = new Vector3(
-                        allFaceNormals.Sum(n => n.X),
-                        allFaceNormals.Sum(n => n.Y),
-                        allFaceNormals.Sum(n => n.Z)
-                    );
+                    var cVertex = closeVertices.Where(cv => cv == vertex.Position).Single();
 
-                    var len = Math.Sqrt(vertexNormal.X * vertexNormal.X + vertexNormal.Y * vertexNormal.Y + vertexNormal.Z * vertexNormal.Z);
-                    vertexNormal.X /= (float)len;
-                    vertexNormal.Y /= (float)len;
-                    vertexNormal.Z /= (float)len;
+                    var len = Math.Sqrt(cVertex.NormalSum.X * cVertex.NormalSum.X + cVertex.NormalSum.Y * cVertex.NormalSum.Y + cVertex.NormalSum.Z * cVertex.NormalSum.Z);
+
+                    var vertexNormal = new Vector3(cVertex.NormalSum / (float)len);
 
                     mesh.Vertices[v].Normal = vertexNormal;
                 }
