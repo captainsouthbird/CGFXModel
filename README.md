@@ -1,8 +1,6 @@
 # CGFXModel
 An attempt at being able to edit ACNL villagers and maybe some other stuff.
 
-Currently I'm not uploading a Release since I want to test it some more in the next few days/weeks, but the code is available here and ready to go if you're anxious to try it yourself.
-
 
 ## **Usage of the Command Line Utility**
 
