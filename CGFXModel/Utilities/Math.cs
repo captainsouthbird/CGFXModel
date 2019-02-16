@@ -167,6 +167,11 @@ namespace CGFXModel.Utilities
             return new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
         }
 
+        public static Vector3 operator -(Vector3 a, Vector3 b)
+        {
+            return new Vector3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+        }
+
         public static Vector3 operator *(Vector3 a, float b)
         {
             return new Vector3(a.X * b, a.Y * b, a.Z * b);
@@ -209,6 +214,11 @@ namespace CGFXModel.Utilities
             float z = a.Z * b.Z;
 
             return x + y + z;
+        }
+
+        public static float AngleBetween(Vector3 vec1, Vector3 vec2)
+        {
+            return (float)Math.Acos(dot(vec1, vec2) / (vec1.length() * vec2.length()));
         }
 
         public override string ToString()

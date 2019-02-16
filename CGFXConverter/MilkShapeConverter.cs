@@ -351,18 +351,29 @@ namespace CGFXConverter
                     }
 
                     float weight = 0;
-                    if (weightIndex < vertex.Weights.Length) weight = vertex.Weights[weightIndex++];
-                    weightSum += weight;
-                    var matrixTransform = m * Matrix.scale(weight);
-
-                    // Inverting the final transformation matrix is used to "undo" the bone
-                    // transformation and restore the vertex back to its "bone neutral" position
-                    if(invert)
+                    if (weightIndex < vertex.Weights.Length)
                     {
-                        matrixTransform = matrixTransform.invert();
+                        weight = vertex.Weights[weightIndex++];
                     }
 
-                    p = Vector3.transform(p, matrixTransform);
+                    // A weight of zero creates a zero matrix and ruins everything
+                    // ACNL's Isabelle incidentally seems to have a secondary (unused?) bone assignment
+                    // to every vertex in mesh 0 but it has a zero weight so it shouldn't be employed.
+                    // But it breaks this adjustment...
+                    if (weight > 0)
+                    {
+                        weightSum += weight;
+                        var matrixTransform = m * Matrix.scale(weight);
+
+                        // Inverting the final transformation matrix is used to "undo" the bone
+                        // transformation and restore the vertex back to its "bone neutral" position
+                        if (invert)
+                        {
+                            matrixTransform = matrixTransform.invert();
+                        }
+
+                        p = Vector3.transform(p, matrixTransform);
+                    }
                 }
 
                 // FIXME: Dunno if this is correct (if it ever even gets used in any case)

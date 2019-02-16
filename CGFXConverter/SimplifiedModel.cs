@@ -283,7 +283,11 @@ namespace CGFXConverter
                     var material = model.ModelMaterials.Entries.Select(e => e.EntryObject).Cast<DICTObjModelMaterial>().ToList()[mesh.MaterialId];
                     var texture = material.TextureMappers.First().TextureReference;
                     var name = texture.ReferenceName;
-                    var smTexture = Textures.Where(t => t.Name == name).SingleOrDefault();
+                    var smTexture = (Textures != null) ? Textures.Where(t => t.Name == name).SingleOrDefault() : null;
+                    if(smTexture == null)
+                    {
+                        smTexture = new SMTexture(name, null);
+                    }
 
                     Meshes[m] = new SMMesh(vertices, triangles, shape, vertexBufferIndex, smTexture);
                 }
@@ -326,6 +330,11 @@ namespace CGFXConverter
 
                         if (textureData != null)
                         {
+                            if(textureBitmap.Width != textureData.Width || textureBitmap.Height != textureData.Height)
+                            {
+                                throw new InvalidOperationException($"{textureData.Name} import: Bitmap mismatched expected dimensions -- texture data expected {textureData.Width}x{textureData.Height}, importing image is {textureBitmap.Width}x{textureBitmap.Height}");
+                            }
+
                             var imgData = textureBitmap.LockBits(new Rectangle(0, 0, (int)textureData.Width, (int)textureData.Height), ImageLockMode.ReadOnly, textureBitmap.PixelFormat);
                             var rawRGBAData = new byte[(imgData.Height * imgData.Stride)];
                             Marshal.Copy(imgData.Scan0, rawRGBAData, 0, rawRGBAData.Length);
